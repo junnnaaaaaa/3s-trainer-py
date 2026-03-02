@@ -1,6 +1,9 @@
 import sys
 import random
 from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtQml import QQmlApplicationEngine
+
 
 class MyWidget(QtWidgets.QWidget):
     def __init__(self):
@@ -21,11 +24,15 @@ class MyWidget(QtWidgets.QWidget):
     @QtCore.Slot()
     def magic(self):
         self.text.setText(random.choice(self.hello))
+
+
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([])
-
-    widget = MyWidget()
-    widget.resize(800, 600)
-    widget.show()
-
-    sys.exit(app.exec())
+    app = QGuiApplication(sys.argv)
+    engine = QQmlApplicationEngine()
+    engine.addImportPath(sys.path[0])
+    engine.loadFromModule("qml", "main")
+    if not engine.rootObjects():
+        sys.exit(-1)
+    exit_code = app.exec()
+    del engine
+    sys.exit(exit_code)
