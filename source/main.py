@@ -1,38 +1,51 @@
 import sys
 import random
+import string
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtQml import QQmlApplicationEngine
-
-
-class MyWidget(QtWidgets.QWidget):
-    def __init__(self):
+LETTERS = [chr(i) for i in range(65, 89)]
+class homeMenu(QtWidgets.QWidget):
+    def __init__(self, controller):
         super().__init__()
-
-        self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
-
-        self.button = QtWidgets.QPushButton("Click me!")
+        self.laying = QtWidgets.QVBoxLayout(self)
+        self.edgeButton = QtWidgets.QPushButton("Edge Menu")
+        self.cornerButton = QtWidgets.QPushButton("Corner Menu")
         self.text = QtWidgets.QLabel("Hello World",
                                      alignment=QtCore.Qt.AlignCenter)
+        self.laying.addWidget(self.text)
+        self.laying.addWidget(self.edgeButton)
+        self.laying.addWidget(self.cornerButton)
+        self.edgeButton.clicked.connect(lambda: controller.setPage(1, True, "A"))
+        self.cornerButton.clicked.connect(lambda: controller.setPage(1, False, "A"))
+class commMenu(QtWidgets.QWidget):
+    def __init__(self, controller, pieceType: bool, letter: str):
+        super().__init__()
+        self.text = QtWidgets.QLabel("Hello World",
+                                     alignment=QtCore.Qt.AlignCenter)
+        self.letter = QtWidgets.QLabel("Your letter is: " + letter, alignment=QtCore.Qt.AlignCenter)
+        self.backButton = QtWidgets.QPushButton("Back")
+        self.laying = QtWidgets.QVBoxLayout(self)
+        self.laying.addWidget(self.letter) 
+        self.laying.addWidget(self.text)
+        self.laying.addWidget(self.backButton)
+        self.backButton.clicked.connect(lambda: controller.setPage(0))
+class mainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.stack = QtWidgets.QStackedWidget()
+        self.home = homeMenu(self)
+        self.comms = commMenu(self, False, 'A')
+        self.stack.addWidget(self.home)
+        self.stack.addWidget(self.comms)
+        self.setCentralWidget(self.stack)
+        self.stack.setCurrentIndex(0)
+    def setPage(self, index: int, pieceTypeIn = False, letterIn = ''):
+        self.comms = commMenu(self, pieceTypeIn, letterIn)
+        self.stack.setCurrentIndex(index)
 
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
-
-        self.button.clicked.connect(self.magic)
-
-    @QtCore.Slot()
-    def magic(self):
-        self.text.setText(random.choice(self.hello))
-
+        
 
 if __name__ == "__main__":
-    app = QGuiApplication(sys.argv)
-    engine = QQmlApplicationEngine()
-    engine.addImportPath(sys.path[0])
-    engine.loadFromModule("qml", "main")
-    if not engine.rootObjects():
-        sys.exit(-1)
-    exit_code = app.exec()
-    del engine
-    sys.exit(exit_code)
+    app = QtWidgets.QApplication(sys.argv)
+    window = mainWindow()
+    window.show()
+    app.exec()
