@@ -9,22 +9,20 @@ class homeMenu(QtWidgets.QWidget):
         self.laying = QtWidgets.QVBoxLayout(self)
         self.edgeButton = QtWidgets.QPushButton("Edge Menu")
         self.cornerButton = QtWidgets.QPushButton("Corner Menu")
-        self.text = QtWidgets.QLabel("Hello World",
+        self.text = QtWidgets.QLabel("Main Menu",
                                      alignment=QtCore.Qt.AlignCenter)
         self.laying.addWidget(self.text)
         self.laying.addWidget(self.edgeButton)
         self.laying.addWidget(self.cornerButton)
-        self.edgeButton.clicked.connect(lambda: controller.setPage(1, True, "A"))
-        self.cornerButton.clicked.connect(lambda: controller.setPage(1, False, "A"))
+        self.edgeButton.clicked.connect(lambda: controller.setPage(1, True, "C"))
+        self.cornerButton.clicked.connect(lambda: controller.setPage(1, False, "B"))
 class commMenu(QtWidgets.QWidget):
     def __init__(self, controller, pieceType: bool, letter: str):
         super().__init__()
-        self.text = QtWidgets.QLabel("Hello World",
+        self.text = QtWidgets.QLabel(( "Edge Menu: " if pieceType else "Corner Menu: ") + letter,
                                      alignment=QtCore.Qt.AlignCenter)
-        self.letter = QtWidgets.QLabel("Your letter is: " + letter, alignment=QtCore.Qt.AlignCenter)
         self.backButton = QtWidgets.QPushButton("Back")
         self.laying = QtWidgets.QVBoxLayout(self)
-        self.laying.addWidget(self.letter) 
         self.laying.addWidget(self.text)
         self.laying.addWidget(self.backButton)
         self.backButton.clicked.connect(lambda: controller.setPage(0))
@@ -39,7 +37,9 @@ class mainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.stack)
         self.stack.setCurrentIndex(0)
     def setPage(self, index: int, pieceTypeIn = False, letterIn = ''):
+        self.stack.removeWidget(self.comms)
         self.comms = commMenu(self, pieceTypeIn, letterIn)
+        self.stack.addWidget(self.comms)
         self.stack.setCurrentIndex(index)
 
         
