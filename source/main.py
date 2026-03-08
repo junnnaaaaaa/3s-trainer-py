@@ -8,7 +8,7 @@ class letterDialogue(QtWidgets.QDialog):
     def __init__(self, controller):
         super().__init__()
         self.setWindowTitle("Enter first letter:")
-        self.prompt = QtWidgets.QLabel("Enter first letter of letterpair:")
+        self.prompt = QtWidgets.QLabel("Enter first letter of letter pair:")
         self.edit = QtWidgets.QLineEdit()
         self.button = QtWidgets.QPushButton("Enter")
         self.laying = QtWidgets.QVBoxLayout()
@@ -53,6 +53,7 @@ class homeMenu(QtWidgets.QWidget):
         self.laying.addWidget(self.cornerButton)
         self.edgeButton.clicked.connect(lambda: controller.dialog.iniate(True))
         self.cornerButton.clicked.connect(lambda: controller.dialog.iniate(False))
+        
 class commMenu(QtWidgets.QWidget):
     def __init__(self, controller, pieceType: bool, letter: str):
         super().__init__()
@@ -61,10 +62,20 @@ class commMenu(QtWidgets.QWidget):
             alignment=QtCore.Qt.AlignCenter,
         )
         self.backButton = QtWidgets.QPushButton("Back")
-        self.laying = QtWidgets.QVBoxLayout(self)
-        self.laying.addWidget(self.text)
-        self.laying.addWidget(self.backButton)
+        self.laying = QtWidgets.QGridLayout(self)
+        self.laying.addWidget(self.text, 0, 2)
         self.backButton.clicked.connect(lambda: controller.setPage(0))
+        self.pairButtons = []
+        for i in range(len(LETTERS)):
+            self.pairButtons.append(letterPair(controller, letter, LETTERS[i]))
+            if i < 4:
+                self.laying.addWidget(self.pairButtons[i], 1, i)
+            else:
+                self.laying.addWidget(self.pairButtons[i])
+        self.laying.addWidget(self.backButton, 8, 0)
+
+
+
 
 
 class mainWindow(QtWidgets.QMainWindow):
