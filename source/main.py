@@ -1,3 +1,4 @@
+from PyQt5.QtWidgets import QAction
 import sys
 import random
 import string
@@ -38,8 +39,10 @@ class letterPair(QtWidgets.QPushButton):
     def __init__(self, controller, letter1: str, letter2: str):
         super().__init__(letter1 + letter2)
         self.comm = ""
-        # self.menu = QtWidgets.QTabWidget()
-
+        self.entering = pairMenu(self)
+class pairMenu(QtWidgets.QTabWidget):
+    def __init__(self, controller):
+        super().__init__()
 
 class homeMenu(QtWidgets.QWidget):
     def __init__(self, controller):
@@ -53,7 +56,6 @@ class homeMenu(QtWidgets.QWidget):
         self.laying.addWidget(self.cornerButton)
         self.edgeButton.clicked.connect(lambda: controller.dialog.iniate(True))
         self.cornerButton.clicked.connect(lambda: controller.dialog.iniate(False))
-        
 class commMenu(QtWidgets.QWidget):
     def __init__(self, controller, pieceType: bool, letter: str):
         super().__init__()
@@ -81,6 +83,7 @@ class commMenu(QtWidgets.QWidget):
 class mainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("3 Style trainer")
         self.stack = QtWidgets.QStackedWidget()
         self.home = homeMenu(self)
         self.comms = commMenu(self, False, "A")
@@ -90,6 +93,18 @@ class mainWindow(QtWidgets.QMainWindow):
         self.dialog = letterDialogue(self)
         self.stack.setCurrentIndex(0)
         self.pieceType = False
+        importEdgeWords = QtGui.QAction("Import Edges",self)
+        importCornerWords = QtGui.QAction("Import Corners",self)       
+        importEdgeComm = QtGui.QAction("Import Edges",self)
+        importCornerComm = QtGui.QAction("Import Corners",self)
+        menu = self.menuBar()
+        fileMenu = menu.addMenu("&File")
+        fileWords= fileMenu.addMenu("Import Words")
+        fileWords.addAction(importEdgeWords)
+        fileWords.addAction(importCornerWords)
+        fileComms= fileMenu.addMenu("Import Comms")
+        fileComms.addAction(importEdgeComm)
+        fileComms.addAction(importCornerComm)
     def setPage(self, index: int, pieceTypeIn=False, letterIn=''):
         self.stack.removeWidget(self.comms)
         self.comms = commMenu(self, pieceTypeIn, letterIn)
