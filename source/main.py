@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QAction
+
 import sys
 import random
 import string
@@ -8,6 +8,7 @@ LETTERS = [chr(i) for i in range(65, 89)]
 class letterDialogue(QtWidgets.QDialog):
     def __init__(self, controller):
         super().__init__()
+        self.setFixedSize(400,400)
         self.setWindowTitle("Enter first letter:")
         self.prompt = QtWidgets.QLabel("Enter first letter of letter pair:")
         self.edit = QtWidgets.QLineEdit()
@@ -38,11 +39,38 @@ class letterDialogue(QtWidgets.QDialog):
 class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
         super().__init__()
+        self.toggleState = False
         self.comm = ""
         self.word = ""
+        self.commEnter = QtWidgets.QLineEdit(self.comm)
+        self.wordEnter =  QtWidgets.QLineEdit(self.word)
+        self.enterButton = QtWidgets.QPushButton("Enter")
         self.button = QtWidgets.QPushButton(letter1+letter2)
         self.laying = QtWidgets.QVBoxLayout(self)
+        self.laying.setSpacing(1)
+        self.laying.setAlignment(QtCore.Qt.AlignTop)
         self.laying.addWidget(self.button)
+        self.button.clicked.connect(lambda: self.toggle())
+        self.setMaximumSize(380, 100)
+        self.setMinimumSize(200, 100)
+    def toggle(self):
+        if not self.toggleState:
+            self.toggleState = True
+            self.laying.addWidget(self.commEnter)
+            self.laying.addWidget(self.wordEnter)
+            self.laying.addWidget(self.enterButton)
+            self.commEnter.show()
+            self.wordEnter.show()
+            self.enterButton.show()
+        else:    
+            self.toggleState = False
+            self.laying.removeWidget(self.commEnter)
+            self.laying.removeWidget(self.wordEnter)
+            self.laying.removeWidget(self.enterButton)
+            self.commEnter.hide()
+            self.wordEnter.hide()
+            self.enterButton.hide()
+
 class homeMenu(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
@@ -64,13 +92,21 @@ class commMenu(QtWidgets.QWidget):
         )
         self.backButton = QtWidgets.QPushButton("Back")
         self.laying = QtWidgets.QGridLayout(self)
-        self.laying.addWidget(self.text, 0, 0)
+        self.laying.addWidget(self.text, 0, 0, 3, 0)
         self.backButton.clicked.connect(lambda: controller.setPage(0))
         self.pairButtons = []
+        self.laying.setSpacing(5)
+        self.grid = QtWidgets.QWidget()
+        self.grid.setLayout(self.laying)
+        self.outer = QtWidgets.QHBoxLayout(self)
+        self.outer.addStretch()
+        self.outer.addWidget(self.grid)
+        self.outer.addStretch() 
+    
         for i in range(len(LETTERS)):
             self.pairButtons.append(letterPair(controller, letter, LETTERS[i]))
             if i < 4:
-                self.laying.addWidget(self.pairButtons[i], 1, i)
+                self.laying.addWidget(self.pairButtons[i], 2, i)
             else:
                 self.laying.addWidget(self.pairButtons[i])
         self.laying.addWidget(self.backButton, 8, 0)
@@ -113,6 +149,18 @@ class mainWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet("""
+    QPushButton {
+        font-size: 14px;
+    }
+    QLabel {
+        font-size: 18px;
+    }
+    QLineEdit {
+        font-size: 12px;
+        padding: 3px;
+    }
+""")
     window = mainWindow()
     window.show()
     app.exec()
