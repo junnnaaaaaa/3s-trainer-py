@@ -35,15 +35,14 @@ class letterDialogue(QtWidgets.QDialog):
         return
 
 
-class letterPair(QtWidgets.QPushButton):
+class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
-        super().__init__(letter1 + letter2)
-        self.comm = ""
-        self.entering = pairMenu(self)
-class pairMenu(QtWidgets.QTabWidget):
-    def __init__(self, controller):
         super().__init__()
-
+        self.comm = ""
+        self.word = ""
+        self.button = QtWidgets.QPushButton(letter1+letter2)
+        self.laying = QtWidgets.QVBoxLayout(self)
+        self.laying.addWidget(self.button)
 class homeMenu(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
@@ -65,7 +64,7 @@ class commMenu(QtWidgets.QWidget):
         )
         self.backButton = QtWidgets.QPushButton("Back")
         self.laying = QtWidgets.QGridLayout(self)
-        self.laying.addWidget(self.text, 0, 2)
+        self.laying.addWidget(self.text, 0, 0)
         self.backButton.clicked.connect(lambda: controller.setPage(0))
         self.pairButtons = []
         for i in range(len(LETTERS)):
