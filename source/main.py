@@ -43,7 +43,9 @@ class letterPair(QtWidgets.QWidget):
         self.comm = ""
         self.word = ""
         self.commEnter = QtWidgets.QLineEdit(self.comm)
+        self.commEnter.setPlaceholderText("Enter your commutator")
         self.wordEnter =  QtWidgets.QLineEdit(self.word)
+        self.wordEnter.setPlaceholderText("Enter your word")
         self.enterButton = QtWidgets.QPushButton("Enter")
         self.button = QtWidgets.QPushButton(letter1+letter2)
         self.laying = QtWidgets.QVBoxLayout(self)
@@ -155,6 +157,7 @@ if __name__ == "__main__":
     }
     QLabel {
         font-size: 18px;
+        padding:5px;
     }
     QLineEdit {
         font-size: 12px;
