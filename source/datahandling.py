@@ -47,9 +47,19 @@ def initiatePairs():
             for j in LETTERS:
                 letters = i+j
                 if not i == j:
-                    addPair(pairsParsed, True, letters, '')
-                    addPair(pairsParsed, False, letters, '')
+                    addPair(pairsParsed, True, '', '')
+                    addPair(pairsParsed, False, '', '')
     with open(pairData, mode = "w", encoding="utf-8") as writeFile:
         writeFile.write(json.dumps(pairsParsed, indent=4, separators=(",", ":")))
+def resetPairs(dataType):
+    pairsParsed = readPair()
+    for i in LETTERS:
+        for j in LETTERS:
+            letters = i+j
+            if not i == j:
+                pairsParsed["edges"][letters][dataType] = ''
+                pairsParsed["corners"][letters][dataType] = ''
+    writePair(pairsParsed)
+    return
 
     #print(json.dumps(pairsParsed))

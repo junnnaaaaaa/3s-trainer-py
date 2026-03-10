@@ -160,7 +160,11 @@ class mainWindow(QtWidgets.QMainWindow):
         importEdgeWords = QtGui.QAction("Import Edges",self)
         importCornerWords = QtGui.QAction("Import Corners",self)       
         importEdgeComm = QtGui.QAction("Import Edges",self)
-        importCornerComm = QtGui.QAction("Import Corners",self)
+        importCornerComm = QtGui.QAction("Import Corners",self) 
+        clearComms = QtGui.QAction("Clear Comms",self)
+        clearComms.triggered.connect(lambda: self.clearData("commutator"))
+        clearWords = QtGui.QAction("Clear Words",self)
+        clearWords.triggered.connect(lambda: self.clearData("word"))
         menu = self.menuBar()
         fileMenu = menu.addMenu("&File")
         fileWords= fileMenu.addMenu("Import Words")
@@ -169,6 +173,18 @@ class mainWindow(QtWidgets.QMainWindow):
         fileComms= fileMenu.addMenu("Import Comms")
         fileComms.addAction(importEdgeComm)
         fileComms.addAction(importCornerComm)
+        fileClear = fileMenu.addMenu("Clear data")
+        fileClear.addAction(clearComms)
+        fileClear.addAction(clearWords)
+    def clearData(self, dataType):
+        self.confirmBox = QtWidgets.QMessageBox()
+        self.confirmBox.setText("Warning: All data will be cleared and not saved")
+        self.confirmBox.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Apply | QtWidgets.QMessageBox.StandardButton.Cancel)
+        self.confirmBox.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Cancel)
+        self.apply = self.confirmBox.exec()
+        if self.apply == QtWidgets.QMessageBox.StandardButton.Apply:
+            data.resetPairs(dataType)
+            self.setPage(0)  
     def setPage(self, index: int, pieceTypeIn=False, letterIn=''):
         self.stack.removeWidget(self.comms)
         if index == 1:
