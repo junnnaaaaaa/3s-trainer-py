@@ -1,7 +1,7 @@
-
 import sys
 import random
 import string
+import datahandling as data
 from PySide6 import QtCore, QtWidgets, QtGui
 
 LETTERS = [chr(i) for i in range(65, 89)]
@@ -48,9 +48,11 @@ class letterPair(QtWidgets.QWidget):
             self.button = QtWidgets.QPushButton("Placeholder")
             self.laying.addWidget(self.button)
         else:
+            self.pieceType = controller.pieceType  
+            self.letters = letter1+letter2
             self.toggleState = False
-            self.comm = ""
-            self.word = ""
+            self.comm = data.fetchPair(letter1+letter2, controller.pieceType)[0]
+            self.word = data.fetchPair(letter1+letter2, controller.pieceType)[1]
             self.commEnter = QtWidgets.QLineEdit(self.comm)
             self.commEnter.setPlaceholderText("Enter your commutator")
             self.wordEnter =  QtWidgets.QLineEdit(self.word)
@@ -86,6 +88,7 @@ class letterPair(QtWidgets.QWidget):
         if self.verify(self.commEnter.text()):
             self.comm= self.commEnter.text()
             self.word= self.wordEnter.text() 
+            data.addPair(self.pieceType, self.letters, self.comm, self.word)
             self.laying.removeWidget(self.commEnter)
             self.laying.removeWidget(self.wordEnter)
             self.laying.removeWidget(self.enterButton)
@@ -111,8 +114,9 @@ class homeMenu(QtWidgets.QWidget):
 class commMenu(QtWidgets.QWidget):
     def __init__(self, controller, pieceType: bool, letter: str):
         super().__init__()
+        self.pieceType = pieceType
         self.text = QtWidgets.QLabel(
-            ("Edge Menu: " if pieceType else "Corner Menu: ") + letter,
+            ("Edge Menu: " if self.pieceType else "Corner Menu: ") + letter,
             alignment=QtCore.Qt.AlignCenter,
         )
         self.backButton = QtWidgets.QPushButton("Back")
@@ -129,7 +133,7 @@ class commMenu(QtWidgets.QWidget):
         self.outer.addStretch() 
     
         for i in range(len(LETTERS)):
-            self.pairButtons.append(letterPair(controller, letter, LETTERS[i]))
+            self.pairButtons.append(letterPair(self, letter, LETTERS[i]))
             if i < 4:
                 self.laying.addWidget(self.pairButtons[i], 2, i)
             else:
@@ -167,7 +171,8 @@ class mainWindow(QtWidgets.QMainWindow):
         fileComms.addAction(importCornerComm)
     def setPage(self, index: int, pieceTypeIn=False, letterIn=''):
         self.stack.removeWidget(self.comms)
-        self.comms = commMenu(self, pieceTypeIn, letterIn)
+        if index == 1:
+            self.comms = commMenu(self, pieceTypeIn, letterIn)
         self.stack.addWidget(self.comms)
         self.stack.setCurrentIndex(index)
 

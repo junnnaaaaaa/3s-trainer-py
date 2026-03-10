@@ -2,19 +2,41 @@ import json
 import csv
 import os
 from pathlib import Path
+dataDir = Path.home() / ".3s-trainer" 
+dataDir.mkdir(parents = True, exist_ok = True)
+pairData = dataDir / "pairs.json"
 LETTERS = [chr(i) for i in range(65, 89)]
 
-def addPair(data, pieceTypeIn, letters, comm, word):
+def readPair():
+    with open(pairData, mode="r", encoding="utf-8") as readFile:
+        originalData = readFile.read()
+    return json.loads(originalData)
+
+def writePair(data):
+    with open(pairData, mode = "w", encoding="utf-8") as writeFile:
+        writeFile.write(json.dumps(data, indent=4, separators=(",", ":")))
+
+def strPiece(pieceTypeIn):
+    return "edges" if pieceTypeIn else "corners"
+
+def fetchPair(letters, pieceTypeIn):
+    pieceType = strPiece(pieceTypeIn)
+    pairsParsed = readPair()
+    return [pairsParsed[pieceType][letters]["commutator"], pairsParsed[pieceType][letters]["word"]]
+    
+def addPair(pieceTypeIn, letters, comm, word):
     pieceType = "edges" if pieceTypeIn else "corners"
-    data[pieceType][letters] = {
+    pairsParsed =  readPair()
+    pairsParsed[pieceType][letters] = {
         "commutator": comm,
         "word": word,
     }
-def initiatePairs(data): 
-    if (not data.exists()) or data.stat().st_size == 0:
+    writePair(pairsParsed)
+def initiatePairs(): 
+    if (not pairData.exists()) or pairData.stat().st_size == 0:
         print("file created")
-        data.write_text(json.dumps({}))
-    with open(data, mode="r", encoding="utf-8") as readFile:
+        pairData.write_text(json.dumps({}))
+    with open(pairData, mode="r", encoding="utf-8") as readFile:
         originalData = readFile.read()
     pairsParsed = json.loads(originalData)
     #print(json.dumps(pairsParsed))
@@ -25,15 +47,9 @@ def initiatePairs(data):
             for j in LETTERS:
                 letters = i+j
                 if not i == j:
-                    addPair(pairsParsed, True, letters, '', '')
-                    addPair(pairsParsed, False, letters, '', '')
-    with open(data, mode = "w", encoding="utf-8") as writeFile:
+                    addPair(pairsParsed, True, letters, '')
+                    addPair(pairsParsed, False, letters, '')
+    with open(pairData, mode = "w", encoding="utf-8") as writeFile:
         writeFile.write(json.dumps(pairsParsed, indent=4, separators=(",", ":")))
 
     #print(json.dumps(pairsParsed))
-def main():
-    dataDir = Path.home() / ".3s-trainer" 
-    dataDir.mkdir(parents = True, exist_ok = True)
-    pairData = dataDir / "pairs.json"
-    initiatePairs(pairData)
-main()
