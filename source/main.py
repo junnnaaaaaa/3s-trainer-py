@@ -176,6 +176,9 @@ class mainWindow(QtWidgets.QMainWindow):
         fileClear = fileMenu.addMenu("Clear data")
         fileClear.addAction(clearComms)
         fileClear.addAction(clearWords)
+    def importData(self, pieceTypeIn, dataType):
+        #placeholder for file part
+        return
     def clearData(self, dataType):
         self.confirmBox = QtWidgets.QMessageBox()
         self.confirmBox.setText("Warning: All data will be cleared and not saved")
@@ -208,6 +211,7 @@ if __name__ == "__main__":
         padding: 3px;
     }
 """)
+    data.initiatePairs()
     window = mainWindow()
     window.show()
     app.exec()

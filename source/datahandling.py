@@ -1,5 +1,5 @@
 import json 
-import csv
+import csv 
 import os
 from pathlib import Path
 dataDir = Path.home() / ".3s-trainer" 
@@ -45,10 +45,16 @@ def initiatePairs():
         pairsParsed = {"initiated": "yes", "corners": {}, "edges": {}}
         for i in LETTERS:
             for j in LETTERS:
-                letters = i+j
+                letters = i + j
                 if not i == j:
-                    addPair(pairsParsed, True, '', '')
-                    addPair(pairsParsed, False, '', '')
+                    pairsParsed["edges"][letters] = {
+                        "commutator": '',
+                        "word": '',
+                    }
+                    pairsParsed["corners"][letters] = {
+                        "commutator": '',
+                        "word": '',
+                    }
     with open(pairData, mode = "w", encoding="utf-8") as writeFile:
         writeFile.write(json.dumps(pairsParsed, indent=4, separators=(",", ":")))
 def resetPairs(dataType):
@@ -61,5 +67,18 @@ def resetPairs(dataType):
                 pairsParsed["corners"][letters][dataType] = ''
     writePair(pairsParsed)
     return
+def importCsv(filePath, pieceTypeIn, dataType):
+    pieceType = strPiece(pieceTypeIn)
+    with open (filePath, newline = '') as csvfile:
+        data = list(csv.reader(csvfile))
+    pairsParsed = readPair()
+    for i in range(len(LETTERS)):
+        for j in range(len(LETTERS)):
+            letters = LETTERS[i] + LETTERS[j]
+            if not i == j:
+                pairsParsed[pieceType][letters][dataType] = data[j+1][i+1]
+                print(letters + ': ', data[j+1][i+1])
+    writePair(pairsParsed)
+    
 
-    #print(json.dumps(pairsParsed))
+    
