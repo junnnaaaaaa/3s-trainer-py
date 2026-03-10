@@ -38,23 +38,32 @@ class letterDialogue(QtWidgets.QDialog):
 
 class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
-        super().__init__()
-        self.toggleState = False
-        self.comm = ""
-        self.word = ""
-        self.commEnter = QtWidgets.QLineEdit(self.comm)
-        self.commEnter.setPlaceholderText("Enter your commutator")
-        self.wordEnter =  QtWidgets.QLineEdit(self.word)
-        self.wordEnter.setPlaceholderText("Enter your word")
-        self.enterButton = QtWidgets.QPushButton("Enter")
-        self.button = QtWidgets.QPushButton(letter1+letter2)
+        super().__init__() 
+        self.setMaximumSize(380, 100)
+        self.setMinimumSize(200, 100) 
         self.laying = QtWidgets.QVBoxLayout(self)
         self.laying.setSpacing(1)
         self.laying.setAlignment(QtCore.Qt.AlignTop)
-        self.laying.addWidget(self.button)
-        self.button.clicked.connect(lambda: self.toggle())
-        self.setMaximumSize(380, 100)
-        self.setMinimumSize(200, 100)
+        if letter1 == letter2:
+            self.button = QtWidgets.QPushButton("Placeholder")
+            self.laying.addWidget(self.button)
+        else:
+            self.toggleState = False
+            self.comm = ""
+            self.word = ""
+            self.commEnter = QtWidgets.QLineEdit(self.comm)
+            self.commEnter.setPlaceholderText("Enter your commutator")
+            self.wordEnter =  QtWidgets.QLineEdit(self.word)
+            self.wordEnter.setPlaceholderText("Enter your word")
+            self.enterButton = QtWidgets.QPushButton("Enter")
+            self.button = QtWidgets.QPushButton(letter1+letter2)
+            self.laying.addWidget(self.button)
+            self.button.clicked.connect(lambda: self.toggle())
+            self.enterButton.clicked.connect(lambda: self.enter())
+
+    def verify(self, comm):
+        #Placeholder function for verification purposes
+        return True
     def toggle(self):
         if not self.toggleState:
             self.toggleState = True
@@ -72,6 +81,20 @@ class letterPair(QtWidgets.QWidget):
             self.commEnter.hide()
             self.wordEnter.hide()
             self.enterButton.hide()
+
+    def enter(self):
+        if self.verify(self.commEnter.text()):
+            self.comm= self.commEnter.text()
+            self.word= self.wordEnter.text() 
+            self.laying.removeWidget(self.commEnter)
+            self.laying.removeWidget(self.wordEnter)
+            self.laying.removeWidget(self.enterButton)
+            self.commEnter.hide()
+            self.wordEnter.hide()
+            self.enterButton.hide()
+            self.toggleState = False
+        else:
+            QtWidgets.QMessageBox.about(self, "Error", "Commutator entered is not valid")
 
 class homeMenu(QtWidgets.QWidget):
     def __init__(self, controller):
