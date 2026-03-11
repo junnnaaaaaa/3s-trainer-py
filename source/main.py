@@ -3,7 +3,7 @@ import random
 import string
 import datahandling as data
 from PySide6 import QtCore, QtWidgets, QtGui
-
+from pathlib import Path
 LETTERS = [chr(i) for i in range(65, 89)]
 class letterDialogue(QtWidgets.QDialog):
     def __init__(self, controller):
@@ -161,6 +161,10 @@ class mainWindow(QtWidgets.QMainWindow):
         importCornerWords = QtGui.QAction("Import Corners",self)       
         importEdgeComm = QtGui.QAction("Import Edges",self)
         importCornerComm = QtGui.QAction("Import Corners",self) 
+        importEdgeWords.triggered.connect(lambda: self.importData(True, "word"))
+        importCornerWords.triggered.connect(lambda: self.importData(False, "word"))
+        importEdgeComm.triggered.connect(lambda: self.importData(True, "commutator"))
+        importCornerComm.triggered.connect(lambda: self.importData(False, "commutator"))
         clearComms = QtGui.QAction("Clear Comms",self)
         clearComms.triggered.connect(lambda: self.clearData("commutator"))
         clearWords = QtGui.QAction("Clear Words",self)
@@ -177,8 +181,12 @@ class mainWindow(QtWidgets.QMainWindow):
         fileClear.addAction(clearComms)
         fileClear.addAction(clearWords)
     def importData(self, pieceTypeIn, dataType):
-        #placeholder for file part
-        return
+        filePath = QtWidgets.QFileDialog.getOpenFileName(self, self.tr("Open File"), str(Path.home()), self.tr("CSV Files (*.csv)"))
+        print("selection done")
+        print(filePath)
+        if not filePath[0] == '':
+            print("improt started")
+            data.importCsv(filePath[0], pieceTypeIn, dataType)
     def clearData(self, dataType):
         self.confirmBox = QtWidgets.QMessageBox()
         self.confirmBox.setText("Warning: All data will be cleared and not saved")
