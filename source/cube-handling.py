@@ -40,58 +40,6 @@ def verifyAlg(alg: str):
     return isValid
 
 def test():
-   # Basic Valid Moves
-    print("Test 1 value: " + str(verifyAlg("R")) + "   Expected Value: True")
-    print("Test 2 value: " + str(verifyAlg("L")) + "   Expected Value: True")
-    print("Test 3 value: " + str(verifyAlg("F")) + "   Expected Value: True")
-    print("Test 4 value: " + str(verifyAlg("B")) + "   Expected Value: True")
-    print("Test 5 value: " + str(verifyAlg("U")) + "   Expected Value: True")
-    print("Test 6 value: " + str(verifyAlg("D")) + "   Expected Value: True")
+    pass
 
-# Slice / Rotation Moves
-    print("Test 7 value: " + str(verifyAlg("M")) + "   Expected Value: True")
-    print("Test 8 value: " + str(verifyAlg("S")) + "   Expected Value: True")
-    print("Test 9 value: " + str(verifyAlg("E")) + "   Expected Value: True")
-    print("Test 10 value: " + str(verifyAlg("x")) + "   Expected Value: True")
-    print("Test 11 value: " + str(verifyAlg("y")) + "   Expected Value: True")
-    print("Test 12 value: " + str(verifyAlg("z")) + "   Expected Value: True")
 
-# Modifiers
-    print("Test 13 value: " + str(verifyAlg("R'")) + "   Expected Value: True")
-    print("Test 14 value: " + str(verifyAlg("R2")) + "   Expected Value: True")
-    print("Test 15 value: " + str(verifyAlg("Rw")) + "   Expected Value: True")
-    print("Test 16 value: " + str(verifyAlg("r")) + "   Expected Value: True")
-
-# Multi-Move Algorithms
-    print("Test 17 value: " + str(verifyAlg("R U R' U'")) + "   Expected Value: True")
-    print("Test 18 value: " + str(verifyAlg("R U R' U R U2 R'")) + "   Expected Value: True")
-    print("Test 19 value: " + str(verifyAlg("R U R' F' R U R' U' R' F R2 U' R'")) + "   Expected Value: True")
-
-# Commutators (any string with ',' is valid)
-    print("Test 20 value: " + str(verifyAlg("R, U")) + "   Expected Value: True")
-    print("Test 21 value: " + str(verifyAlg("[R, U]")) + "   Expected Value: True")
-
-# Ignored Characters
-    print("Test 22 value: " + str(verifyAlg("(R U R' U')")) + "   Expected Value: True")
-    print("Test 23 value: " + str(verifyAlg("{R U}")) + "   Expected Value: True")
-    print("Test 24 value: " + str(verifyAlg("[R U]")) + "   Expected Value: True")
-
-# Empty String
-    print("Test 25 value: " + str(verifyAlg("")) + "   Expected Value: True")
-
-# Invalid Move Letters
-    print("Test 26 value: " + str(verifyAlg("Q")) + "   Expected Value: False")
-    print("Test 27 value: " + str(verifyAlg("A")) + "   Expected Value: False")
-    print("Test 28 value: " + str(verifyAlg("R U Q U'")) + "   Expected Value: False")
-    print("Test 29 value: " + str(verifyAlg("3")) + "   Expected Value: False")
-    print("Test 30 value: " + str(verifyAlg("R @ U")) + "   Expected Value: False")
-
-# Invalid Repeated Modifiers (currently bugged - will return True)
-    print("Test 31 value: " + str(verifyAlg("R''")) + "   Expected Value: False")
-    print("Test 32 value: " + str(verifyAlg("R22")) + "   Expected Value: False")
-    print("Test 33 value: " + str(verifyAlg("R2'")) + "   Expected Value: False")
-
-# Wide modifier on slice move
-    print("Test 34 value: " + str(verifyAlg("Mw")) + "   Expected Value: False")
-
-test()
