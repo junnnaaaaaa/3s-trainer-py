@@ -2,6 +2,7 @@ import sys
 import random
 import string
 import datahandling as data
+import cubehandling as cube
 from PySide6 import QtCore, QtWidgets, QtGui
 from pathlib import Path
 LETTERS = [chr(i) for i in range(65, 89)]
@@ -63,9 +64,6 @@ class letterPair(QtWidgets.QWidget):
             self.button.clicked.connect(lambda: self.toggle())
             self.enterButton.clicked.connect(lambda: self.enter())
 
-    def verify(self, comm):
-        #Placeholder function for verification purposes
-        return True
     def toggle(self):
         if not self.toggleState:
             self.toggleState = True
@@ -85,7 +83,7 @@ class letterPair(QtWidgets.QWidget):
             self.enterButton.hide()
 
     def enter(self):
-        if self.verify(self.commEnter.text()):
+        if cube.verifyAlg(self.commEnter.text()):
             self.comm= self.commEnter.text()
             self.word= self.wordEnter.text() 
             data.addPair(self.pieceType, self.letters, self.comm, self.word)
@@ -185,8 +183,9 @@ class mainWindow(QtWidgets.QMainWindow):
         print("selection done")
         print(filePath)
         if not filePath[0] == '':
-            print("improt started")
-            data.importCsv(filePath[0], pieceTypeIn, dataType)
+            print("import started")
+            badPairs = data.importCsv(filePath[0], pieceTypeIn, dataType)
+            QtWidgets.QMessageBox.about(self, "Import success", "The following pairs didn't import due to invalid comms/algs: " + badPairs)
     def clearData(self, dataType):
         self.confirmBox = QtWidgets.QMessageBox()
         self.confirmBox.setText("Warning: All data will be cleared and not saved")

@@ -1,6 +1,7 @@
 import json 
 import csv 
 import os
+import cubehandling as cube
 from pathlib import Path
 dataDir = Path.home() / ".3s-trainer" 
 dataDir.mkdir(parents = True, exist_ok = True)
@@ -68,6 +69,7 @@ def resetPairs(dataType):
     writePair(pairsParsed)
     return
 def importCsv(filePath, pieceTypeIn, dataType):
+    badPairs = ""
     pieceType = strPiece(pieceTypeIn)
     with open (filePath, newline = '') as csvfile:
         data = list(csv.reader(csvfile))
@@ -76,9 +78,13 @@ def importCsv(filePath, pieceTypeIn, dataType):
         for j in range(len(LETTERS)):
             letters = LETTERS[i] + LETTERS[j]
             if not i == j:
-                pairsParsed[pieceType][letters][dataType] = data[j+1][i+1]
-                print(letters + ': ', data[j+1][i+1])
+                success = cube.verifyAlg(data[j+1][i+1])
+                if success or dataType == "word":
+                    pairsParsed[pieceType][letters][dataType] = data[j+1][i+1]
+                    print(letters + ': ', data[j+1][i+1])
+                else:
+                    badPairs += letters + ", "
     writePair(pairsParsed)
-    
+    return badPairs
 
     
