@@ -37,6 +37,20 @@ class letterDialogue(QtWidgets.QDialog):
         return
 
 
+class timer(QtWidgets.QWidget):
+    def __init__(self, controller):
+        super().__init__()
+        self.chosenPairs = []
+        self.isEdge = True
+        self.edgeButton = QtWidgets.QPushButton()
+        self.pairSelection = QtWidgets.QPushButton("Select letter Pairs")
+        self.timer = QtCore.QTimer(self)
+        self.timerDisplay = ''
+        self.pairSelect = QtWidgets.QDialog()
+        self.laying = QtWidgets.QVBoxLayout()   
+        self.dialogLaying = QtWidgets.QVBoxLayout()   
+        self.setLayout(self.laying)
+        self.pairSelect.setLayout(self.dialogLaying)
 class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
         super().__init__() 
