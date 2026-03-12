@@ -70,21 +70,26 @@ def resetPairs(dataType):
     return
 def importCsv(filePath, pieceTypeIn, dataType):
     badPairs = ""
+    output = ""
     pieceType = strPiece(pieceTypeIn)
     with open (filePath, newline = '') as csvfile:
         data = list(csv.reader(csvfile))
     pairsParsed = readPair()
-    for i in range(len(LETTERS)):
-        for j in range(len(LETTERS)):
-            letters = LETTERS[i] + LETTERS[j]
-            if not i == j:
-                success = cube.verifyAlg(data[j+1][i+1])
-                if success or dataType == "word":
-                    pairsParsed[pieceType][letters][dataType] = data[j+1][i+1]
-                    print(letters + ': ', data[j+1][i+1])
-                else:
-                    badPairs += letters + ", "
-    writePair(pairsParsed)
-    return badPairs
+    if len(data) != 25 or len(data) != 25:
+        output = "Bad table"
+    else:
+        for i in range(len(LETTERS)):
+            for j in range(len(LETTERS)):
+                letters = LETTERS[i] + LETTERS[j]
+                if not i == j and len(letters) == 2:
+                    success = cube.verifyAlg(data[j+1][i+1])
+                    if success or dataType == "word":
+                        pairsParsed[pieceType][letters][dataType] = data[j+1][i+1]
+                        print(letters + ': ', data[j+1][i+1])
+                    else:
+                        badPairs += letters + ", "
+        writePair(pairsParsed)
+        output = badPairs
+    return output
 
     

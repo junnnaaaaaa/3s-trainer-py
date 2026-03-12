@@ -184,8 +184,11 @@ class mainWindow(QtWidgets.QMainWindow):
         print(filePath)
         if not filePath[0] == '':
             print("import started")
-            badPairs = data.importCsv(filePath[0], pieceTypeIn, dataType)
-            QtWidgets.QMessageBox.about(self, "Import success", "The following pairs didn't import due to invalid comms/algs: " + badPairs)
+            importOutput = data.importCsv(filePath[0], pieceTypeIn, dataType)
+            if importOutput == "Bad table":
+                QtWidgets.QMessageBox.about(self, "Import failed", "Please make sure your data is 25 by 25 with the first row and column being labels")
+            else:
+                QtWidgets.QMessageBox.about(self, "Import success", "The following pairs didn't import due to invalid comms/algs: " + importOutput)
     def clearData(self, dataType):
         self.confirmBox = QtWidgets.QMessageBox()
         self.confirmBox.setText("Warning: All data will be cleared and not saved")
