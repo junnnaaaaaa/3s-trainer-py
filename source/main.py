@@ -1,11 +1,15 @@
 import sys
 import random
 import string
+import random
 import datahandling as data
 import cubehandling as cube
 from PySide6 import QtCore, QtWidgets, QtGui
 from pathlib import Path
 LETTERS = [chr(i) for i in range(65, 89)]
+class NoKeyButton(QtWidgets.QPushButton):
+    def keyPressEvent(self, event):
+        event.ignore() 
 class letterDialogue(QtWidgets.QDialog):
     def __init__(self, controller):
         super().__init__()
@@ -43,11 +47,28 @@ class timer(QtWidgets.QWidget):
         self.msElapsed = 0
         self.running = False
         self.chosenPairs = []
+        self.sessionTimes = []
         self.isEdge = True
-        self.edgeButton = QtWidgets.QPushButton()
-        self.pairSelection = QtWidgets.QPushButton("Select letter Pairs")
-        self.timerDisplay = QtWidgets.QLabel("0.00", alignment=QtCore.Qt.AlignCenter)
+        self.prompt = QtWidgets.QLabel("Your Pair and word will go here", alignment=QtCore.Qt.AlignCenter)
+        self.pieceButton = NoKeyButton("Mode: edges")
+        self.pieceButton.clicked.connect(lambda: self.pieceSwap())
+        self.pairSelection = NoKeyButton("Select letter Pairs")
+        self.pairSelection.clicked.connect(lambda: self.pairSelect.show())
+        self.backButton = NoKeyButton("Back")
+        self.backButton.clicked.connect(lambda: controller.setPage(0))
+        self.timerDisplay = QtWidgets.QLabel("0.00")
+        self.timerDisplay.setStyleSheet("font-size: 36pt;")
+        self.timerDisplay.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
+        self.stats = QtWidgets.QLabel("Session stats:\nCurrent time:\nSession mean: ")
         self.pairSelect = QtWidgets.QDialog()
+        self.pairSelect.setFixedSize(400,400)
+        self.pairEnter = QtWidgets.QLineEdit()
+        self.pairEnterButton = QtWidgets.QPushButton("Enter")
+        self.pairEnterButton.clicked.connect(lambda: self.enterPair())
+        self.pairEnter.setPlaceholderText("Enter your pairs")
+        self.dialogLabel = QtWidgets.QLabel("Enter in pairs, or for set of pairs, just the first letter, separated by a comma and space. e.g.: 'A, BC, GH'")
+        self.dialogLabel.setStyleSheet("font-size: 12pt")
+        self.dialogLabel.setWordWrap(True)
         self.laying = QtWidgets.QVBoxLayout()   
         self.dialogLaying = QtWidgets.QVBoxLayout()   
         self.setLayout(self.laying)
@@ -55,7 +76,44 @@ class timer(QtWidgets.QWidget):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(10)
         self.timer.timeout.connect(self.tick)
+        self.laying.addWidget(self.prompt)
         self.laying.addWidget(self.timerDisplay)
+        self.laying.addWidget(self.stats)
+        self.laying.addWidget(self.pieceButton)
+        self.laying.addWidget(self.pairSelection)
+        self.laying.addWidget(self.backButton)
+        self.dialogLaying.addWidget(self.dialogLabel)
+        self.dialogLaying.addWidget(self.pairEnter)
+        self.dialogLaying.addWidget(self.pairEnterButton)
+    def pieceSwap(self):
+        self.isEdge = not self.isEdge
+        self.pieceButton.setText("Mode: " + data.strPiece(self.isEdge))
+    def enterPair(self):
+        allPairs = []
+        try:
+            self.chosenPairs = self.pairEnter.text().split(", ")
+            for i in self.chosenPairs:
+                i = i.upper()
+                if len(i) == 1:
+                    if i not in LETTERS:
+                        QtWidgets.QMessageBox.about(self, 'Error','Formatting not valid')
+                    else:
+                        for j in LETTERS:
+                            allPairs.append(i + j)
+                elif len(i) == 2:
+                    if i[0] not in LETTERS or i[1] not in LETTERS:
+                        print(i)
+                        QtWidgets.QMessageBox.about(self, 'Error','Formatting not valid')
+                    else:
+                        allPairs.append(i)
+                else:
+                    QtWidgets.QMessageBox.about(self, 'Error','Formatting not valid')
+        except:
+            QtWidgets.QMessageBox.about(self, 'Error','Formatting not valid')
+        self.chosenPairs= allPairs
+        print(self.chosenPairs)
+        self.pairSelect.close()
+
     def tick(self):
         self.msElapsed += 10
         self.timerUpdate(self.msElapsed)
@@ -64,20 +122,26 @@ class timer(QtWidgets.QWidget):
         self.timerDisplay.setText(f"{seconds: .2f}")
     def keyReleaseEvent(self, event: QtGui.QKeyEvent):
          if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
-            if not self.running:
+            if not self.running: 
                 self.msElapsed = 0
+                if self.chosenPairs:
+                    self.chosenPair = random.choice(self.chosenPairs)
+                    self.pairInfo = data.fetchPair(self.chosenPair, self.isEdge)
+                    self.prompt.setText(f"Word: {self.pairInfo[1]}  Pair: {self.chosenPair}")
                 self.running = True
                 self.timer.start()
-                self.timerDisplay.setStyleSheet("color: green;")
+                self.timerDisplay.setStyleSheet("color: green; font-size: 36pt;")
             else:
                 self.running = False
                 self.timer.stop()
-                self.timerDisplay.setStyleSheet("color: black;")
+                self.timerDisplay.setStyleSheet("color: black; font-size: 36pt;")
+                self.sessionTimes.append(self.msElapsed / 1000)
+                self.stats.setText(f"Session stats:\nCurrent time: {self.sessionTimes[-1]} \nSession mean: {(sum(self.sessionTimes)/len(self.sessionTimes)): .2f} ")
          else:
             super().keyReleaseEvent(event)
     def keyPressEvent(self, event: QtGui.QKeyEvent):
          if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
-            self.timerDisplay.setStyleSheet("color: green;")
+            self.timerDisplay.setStyleSheet("color: green; font-size: 36pt;")
 class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
         super().__init__() 
