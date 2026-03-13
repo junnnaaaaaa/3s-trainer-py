@@ -34,7 +34,7 @@ class letterDialogue(QtWidgets.QDialog):
     def enter(self, controller):
         self.firstLetter = self.edit.text().capitalize()
         if self.firstLetter in LETTERS:
-            controller.setPage(1,  self.pieceType, self.firstLetter )
+            controller.setPage(2,  self.pieceType, self.firstLetter )
             self.close()
         else:
             QtWidgets.QMessageBox.about(self, 'Error','Input can only be a letter between A and X')
@@ -214,7 +214,7 @@ class homeMenu(QtWidgets.QWidget):
         self.laying.addWidget(self.timerButton)
         self.laying.addWidget(self.edgeButton)
         self.laying.addWidget(self.cornerButton)
-        self.timerButton.clicked.connect(lambda: controller.setPage(2))
+        self.timerButton.clicked.connect(lambda: controller.setPage(1))
         self.edgeButton.clicked.connect(lambda: controller.dialog.iniate(True))
         self.cornerButton.clicked.connect(lambda: controller.dialog.iniate(False))
 class commMenu(QtWidgets.QWidget):
@@ -259,8 +259,8 @@ class mainWindow(QtWidgets.QMainWindow):
         self.comms = commMenu(self, False, "A")
         self.timer = timer(self)
         self.stack.addWidget(self.home)
-        self.stack.addWidget(self.comms)
         self.stack.addWidget(self.timer)
+        self.stack.addWidget(self.comms)
         self.setCentralWidget(self.stack)
         self.dialog = letterDialogue(self)
         self.stack.setCurrentIndex(0)
@@ -309,7 +309,7 @@ class mainWindow(QtWidgets.QMainWindow):
             data.resetPairs(dataType)
             self.setPage(0)  
     def setPage(self, index: int, pieceTypeIn=False, letterIn=''):
-        if index == 1:
+        if index == 2:
             self.stack.removeWidget(self.comms)
             self.comms = commMenu(self, pieceTypeIn, letterIn)
             self.stack.addWidget(self.comms)
