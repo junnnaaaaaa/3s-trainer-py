@@ -40,17 +40,44 @@ class letterDialogue(QtWidgets.QDialog):
 class timer(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
+        self.msElapsed = 0
+        self.running = False
         self.chosenPairs = []
         self.isEdge = True
         self.edgeButton = QtWidgets.QPushButton()
         self.pairSelection = QtWidgets.QPushButton("Select letter Pairs")
-        self.timer = QtCore.QTimer(self)
-        self.timerDisplay = ''
+        self.timerDisplay = QtWidgets.QLabel("0.00", alignment=QtCore.Qt.AlignCenter)
         self.pairSelect = QtWidgets.QDialog()
         self.laying = QtWidgets.QVBoxLayout()   
         self.dialogLaying = QtWidgets.QVBoxLayout()   
         self.setLayout(self.laying)
         self.pairSelect.setLayout(self.dialogLaying)
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(10)
+        self.timer.timeout.connect(self.tick)
+        self.laying.addWidget(self.timerDisplay)
+    def tick(self):
+        self.msElapsed += 10
+        self.timerUpdate(self.msElapsed)
+    def timerUpdate(self, ms):
+        seconds = ms / 1000
+        self.timerDisplay.setText(f"{seconds: .2f}")
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent):
+         if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
+            if not self.running:
+                self.msElapsed = 0
+                self.running = True
+                self.timer.start()
+                self.timerDisplay.setStyleSheet("color: green;")
+            else:
+                self.running = False
+                self.timer.stop()
+                self.timerDisplay.setStyleSheet("color: black;")
+         else:
+            super().keyReleaseEvent(event)
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+         if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
+            self.timerDisplay.setStyleSheet("color: green;")
 class letterPair(QtWidgets.QWidget):
     def __init__(self, controller, letter1: str, letter2: str):
         super().__init__() 
@@ -115,12 +142,15 @@ class homeMenu(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
         self.laying = QtWidgets.QVBoxLayout(self)
+        self.timerButton = QtWidgets.QPushButton("Timer")
         self.edgeButton = QtWidgets.QPushButton("Edge Menu")
         self.cornerButton = QtWidgets.QPushButton("Corner Menu")
         self.text = QtWidgets.QLabel("Main Menu", alignment=QtCore.Qt.AlignCenter)
         self.laying.addWidget(self.text)
+        self.laying.addWidget(self.timerButton)
         self.laying.addWidget(self.edgeButton)
         self.laying.addWidget(self.cornerButton)
+        self.timerButton.clicked.connect(lambda: controller.setPage(2))
         self.edgeButton.clicked.connect(lambda: controller.dialog.iniate(True))
         self.cornerButton.clicked.connect(lambda: controller.dialog.iniate(False))
 class commMenu(QtWidgets.QWidget):
@@ -163,8 +193,10 @@ class mainWindow(QtWidgets.QMainWindow):
         self.stack = QtWidgets.QStackedWidget()
         self.home = homeMenu(self)
         self.comms = commMenu(self, False, "A")
+        self.timer = timer(self)
         self.stack.addWidget(self.home)
         self.stack.addWidget(self.comms)
+        self.stack.addWidget(self.timer)
         self.setCentralWidget(self.stack)
         self.dialog = letterDialogue(self)
         self.stack.setCurrentIndex(0)
@@ -213,10 +245,10 @@ class mainWindow(QtWidgets.QMainWindow):
             data.resetPairs(dataType)
             self.setPage(0)  
     def setPage(self, index: int, pieceTypeIn=False, letterIn=''):
-        self.stack.removeWidget(self.comms)
         if index == 1:
+            self.stack.removeWidget(self.comms)
             self.comms = commMenu(self, pieceTypeIn, letterIn)
-        self.stack.addWidget(self.comms)
+            self.stack.addWidget(self.comms)
         self.stack.setCurrentIndex(index)
 
 
