@@ -29,7 +29,7 @@ I will likely not bother to continue this project but if I do:
 - Allow for different lettering schemes and displaying things by target notation
   rather than just Speffz lettering scheme. (Also helps with comm verification
   in the future)
-- Rewrite with svelte
+- Rewrite with Tauri
 ## Credits 
 - Thanks to https://github.com/b-paul (aka bpaul) for letting me use their comm
   sheets to realise that my import algorithm will need a lot of work in future
